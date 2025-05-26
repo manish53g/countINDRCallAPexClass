@@ -1,0 +1,47 @@
+global class CustomCharLabelFunction implements Callable {
+    
+    global Object call(String action, Map<String, Object> args) {
+        System.debug('=== Entering call method ===');
+        System.debug('Action: ' + action);
+        System.debug('Args: ' + JSON.serialize(args));
+        
+        Map<String, Object> input = (Map<String, Object>) args.get('input');
+        Map<String, Object> output = (Map<String, Object>) args.get('output');
+        Map<String, Object> options = (Map<String, Object>) args.get('options');
+        
+        if (action == 'addCharLabel') {
+            List<Object> records = (List<Object>) input.get('arguments'); // <-- changed from 'records'
+            System.debug('Input Records: ' + JSON.serialize(records));
+            List<Object> labeledRecords = addCharLabels(records);
+            
+            System.debug('Labeled Records: ' + JSON.serialize(labeledRecords));
+            output.put('result', labeledRecords);
+        }
+        
+        System.debug('=== Exiting call method ===');
+        return output;
+    }
+    
+    private List<Object> addCharLabels(List<Object> records) {
+        System.debug('=== Entering addCharLabels method ===');
+        List<Object> outputList = new List<Object>();
+        
+        for (Integer i = 0; i < records.size(); i++) {
+            Map<String, Object> record = (Map<String, Object>) records[i];
+            System.debug('Processing Record Index ' + i + ': ' + JSON.serialize(record));
+            
+            // Calculate ASCII Char: 65 = 'A', 66 = 'B', ...
+            Integer asciiValue = 65 + i;
+            String charLabel = String.fromCharArray(new List<Integer>{asciiValue});
+            
+            System.debug('Assigning CharLabel: ' + charLabel);
+            record.put('CharLabel', charLabel);
+            
+            outputList.add(record);
+        }
+        
+        System.debug('Final Output List: ' + JSON.serialize(outputList));
+        System.debug('=== Exiting addCharLabels method ==='+ outputList.size());
+        return outputList;
+    }
+}
